@@ -10,20 +10,6 @@ use serde::Deserialize;
 use std::time::Duration;
 use tokio::{net::TcpListener, time::sleep};
 
-fn select_city(filter: &str) -> String {
-    let mut output = "
-    with city := assert_single((select City filter .name = <str>$0)),
-    select city { 
-        name, 
-        latitude, 
-        longitude,
-        conditions: { temperature, time }
-    } "
-    .to_string();
-    output.push_str(filter);
-    output
-}
-
 fn select_cities(filter: &str) -> String {
     let mut output = "select City { 
         name, 
@@ -34,6 +20,11 @@ fn select_cities(filter: &str) -> String {
     .to_string();
     output.push_str(filter);
     output
+}
+
+fn select_city(filter: &str) -> String {
+    let output = select_cities(filter);
+    format!("select assert_single(({output}));")
 }
 
 fn insert_city() -> &'static str {
